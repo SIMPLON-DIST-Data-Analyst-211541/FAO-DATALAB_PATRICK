@@ -42,7 +42,8 @@ def treat_negative_values(df, elements_to_nans=None):
 def select_undernourishment_period(df_sous, period_code="20162018"):
     df = df_sous.copy()
     df = clean_value_column(df)
-    df_period = df[df["Code année"] == period_code]
+    period_code_str = str(period_code)
+    df_period = df[df["Code année"].astype(str) == period_code_str]
     # On garde uniquement Zone + Valeur
     df_period = df_period[["Code zone", "Zone", "Valeur"]].rename(
         columns={"Valeur": "Sous_alimentation_millions"}
@@ -59,14 +60,14 @@ def compute_kcal_per_capita(df_veg, df_anim):
     elem_kcal = "Disponibilité alimentaire (kcal/personne/jour)"
 
     kcal_veg = (
-        df_veg[df_veg["Élément"] == elem_kcal]
+        df_veg[df_veg["Élément"].astype(str).str.lower() == elem_kcal.lower()]
         .groupby(["Code zone", "Zone"], as_index=False)["Valeur"]
         .sum()
         .rename(columns={"Valeur": "Kcal_veg"})
     )
 
     kcal_anim = (
-        df_anim[df_anim["Élément"] == elem_kcal]
+        df_anim[df_anim["Élément"].astype(str).str.lower() == elem_kcal.lower()]
         .groupby(["Code zone", "Zone"], as_index=False)["Valeur"]
         .sum()
         .rename(columns={"Valeur": "Kcal_anim"})
